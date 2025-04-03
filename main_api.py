@@ -1,4 +1,8 @@
-from main import query_qwen_text_only, query_qwen_with_files, query_qwen_comparison
+import re
+
+from starlette.responses import FileResponse
+
+#from main import query_qwen_text_only, query_qwen_with_files, query_qwen_comparison
 from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 import os
@@ -12,7 +16,6 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["*"],
 )
-
 
 UPLOAD_FOLDER = "uploads"
 
@@ -60,6 +63,14 @@ def query_qwen_text(query, flowchartPaths=None, pdfPaths=None):
             return None
         else:
             return filePaths.split(',')
-    response = query_qwen_comparison(query, toArray(flowchartPaths), toArray(pdfPaths))
+
+    response = 'query_qwen_comparison(query, toArray(flowchartPaths), toArray(pdfPaths))'
     return {'response': response}
 
+
+@app.get("/get-file/uploads/{path}")
+def get_file(path):
+    if re.match(r'.*\.pdf', path):
+        return FileResponse("uploads//" + path, media_type="application/pdf")
+    else:
+        return FileResponse("uploads//" + path, media_type="image/png")
