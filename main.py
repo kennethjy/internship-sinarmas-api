@@ -375,6 +375,8 @@ def query_qwen_with_rag(query, flowchart_imgs=None, user_provided_pdfs=None, top
 
     response_text = qwen_processor.batch_decode(output_ids, skip_special_tokens=False)[0]
     match = re.search(r"<\|im_start\|>assistant(.*)<\|im_end\|>", response_text, re.DOTALL)
+    if not match:
+        match = re.search(r"<\|im_start\|>assistant(.*)", response_text, re.DOTALL)
     cleaned_response = match.group(1).strip() if match else response_text.strip()
 
     return cleaned_response, retrieved_pdfs, retrieved_images
@@ -555,7 +557,10 @@ def compare_query_qwen_with_rag(query, flowchart_imgs=None, user_provided_pdfs=N
     # Decode and clean response
     response_text = qwen_processor.batch_decode(output_ids, skip_special_tokens=False)[0]
     match = re.search(r"<\|im_start\|>assistant(.*)<\|im_end\|>", response_text, re.DOTALL)
+    if not match:
+        match = re.search(r"<\|im_start\|>assistant(.*)", response_text, re.DOTALL)
     cleaned_response = match.group(1).strip() if match else response_text.strip()
+    print(response_text)
 
     return cleaned_response, retrieved_pdfs, retrieved_images
 
@@ -576,3 +581,4 @@ def query_qwen_comparison(user_query, user_flowchart_imgs=None, user_pdfs=None):
     print(f"🔍 Retrieved Documents: {retrieved_pdfs}")
     print(f"🖼️ Retrieved Flowcharts: {retrieved_images}")
     print(f"⏳ Execution Time: {end_time - start_time:.2f} seconds")
+    return qwen_response_rag

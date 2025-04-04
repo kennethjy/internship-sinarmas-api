@@ -28,11 +28,6 @@ async def upload_photo(file: UploadFile = File(...)):
     try:
         # Save the uploaded file to the upload folder
         file_path = os.path.join(UPLOAD_FOLDER, file.filename)
-        if os.path.exists(file_path):
-            i = 1
-            while os.path.exists(file_path + f'({i})'):
-                i += 1
-            file_path = file_path + f'({i})'
         with open(file_path, "wb") as buffer:
             buffer.write(await file.read())
 
@@ -51,13 +46,13 @@ def query_qwen_text(query):
 
 
 @app.get("/query-qwen/with_files/{query}")
-def query_qwen_text(query, flowchartPath=None, pdfPath=None):
+def query_qwen_files(query, flowchartPath=None, pdfPath=None):
     response = query_qwen_with_files(query, flowchartPath, pdfPath)
     return {'response': response}
 
 
 @app.get("/query-qwen/comparison/{query}")
-def query_qwen_text(query, flowchartPaths=None, pdfPaths=None):
+def query_qwen_compare(query, flowchartPaths=None, pdfPaths=None):
     def toArray(filePaths):
         if len(filePaths) == 0:
             return None
@@ -72,5 +67,8 @@ def query_qwen_text(query, flowchartPaths=None, pdfPaths=None):
 def get_file(path):
     if re.match(r'.*\.pdf', path):
         return FileResponse("uploads//" + path, media_type="application/pdf")
-    else:
+    if re.match(r'.*\.png', path):
         return FileResponse("uploads//" + path, media_type="image/png")
+    if re.match(r'.*\.jpg', path):
+        return FileResponse("uploads//" + path, media_type="image/jpg")
+    return FileResponse("uploads//" + path, media_type="image/png")
