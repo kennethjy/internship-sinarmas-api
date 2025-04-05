@@ -1,4 +1,4 @@
-Run ```uvicorn main_api:app```
+Run ```uvicorn main_api:app --host 127.0.0.1 --port 8000```
 ## Other changes:
 - remove line 16 ```pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'```
 - add flash-attn to qwen model at line 220 ```attn_implementation="flash_attention_2",```
